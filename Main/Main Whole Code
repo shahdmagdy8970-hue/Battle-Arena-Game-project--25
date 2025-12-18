@@ -41,10 +41,12 @@ public class Main extends Application {
         Label title = new Label("⚔ BATTLE ARENA ⚔");
         title.setFont(Font.font("Arial", FontWeight.BOLD, 40));
         title.setTextFill(Color.GOLD);
+        title.setStyle("-fx-effect: dropshadow(gaussian, black, 15, 0.8, 0, 2);");
 
         Label teamLabel = new Label("Team Members Battle");
         teamLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
-        teamLabel.setTextFill(Color.LIGHTBLUE);
+        teamLabel.setTextFill(Color.WHITE);
+        teamLabel.setStyle("-fx-effect: dropshadow(gaussian, black, 10, 0.7, 0, 1);");
 
         HBox playersBox = new HBox(30);
         playersBox.setAlignment(Pos.CENTER);
@@ -62,18 +64,22 @@ public class Main extends Application {
         CheckBox fullMovementCheck = new CheckBox("Enable Full Movement & Rotation");
         fullMovementCheck.setTextFill(Color.YELLOW);
         fullMovementCheck.setFont(Font.font("Arial", FontWeight.BOLD, 14));
+        fullMovementCheck.setStyle("-fx-effect: dropshadow(gaussian, black, 8, 0.6, 0, 1);");
 
         Label weaponInfo = new Label("✨ 4 Weapons Available ✨");
         weaponInfo.setTextFill(Color.LIGHTGREEN);
         weaponInfo.setFont(Font.font("Arial", FontWeight.BOLD, 12));
+        weaponInfo.setStyle("-fx-effect: dropshadow(gaussian, black, 8, 0.6, 0, 1);");
 
         Label weaponDetails = new Label("Weapons: 1=Pistol, 2=Cannon, 3=Magic Staff, 4=Bow");
-        weaponDetails.setTextFill(Color.LIGHTBLUE);
+        weaponDetails.setTextFill(Color.WHITE);
         weaponDetails.setFont(Font.font("Arial", 11));
+        weaponDetails.setStyle("-fx-effect: dropshadow(gaussian, black, 8, 0.6, 0, 1);");
 
         Button startButton = new Button("START GAME");
         startButton.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; " +
-                "-fx-font-size: 18px; -fx-font-weight: bold; -fx-padding: 15 40;");
+                "-fx-font-size: 18px; -fx-font-weight: bold; -fx-padding: 15 40; " +
+                "-fx-effect: dropshadow(gaussian, black, 10, 0.5, 0, 2);");
         startButton.setOnAction(e -> {
             boolean fullMovement = fullMovementCheck.isSelected();
             stage.setScene(createGameScene(stage, player1Choice.getValue(),
@@ -88,7 +94,8 @@ public class Main extends Application {
     private VBox createPlayerSelectionBox(String playerName, FighterType defaultChoice, String controls) {
         VBox box = new VBox(10);
         box.setPadding(new Insets(20));
-        box.setStyle("-fx-background-color: rgba(0,0,0,0.5); -fx-background-radius: 10;");
+        box.setStyle("-fx-background-color: rgba(0,0,0,0.85); -fx-background-radius: 10; " +
+                "-fx-effect: dropshadow(gaussian, black, 15, 0.5, 0, 0);");
 
         Label label = new Label(playerName);
         label.setFont(Font.font("Arial", FontWeight.BOLD, 20));
@@ -108,30 +115,37 @@ public class Main extends Application {
     }
 
     private Scene createGameScene(Stage stage, FighterType p1Type, FighterType p2Type, boolean fullMovement) {
-        BorderPane root = new BorderPane();
+        StackPane root = new StackPane();
         root.setStyle("-fx-background-image: url('file:///C:/Users/alaa/Downloads/WhatsApp%20Image%202025-12-18%20at%2023.58.43_7f5e23cc.jpg'); " +
                 "-fx-background-size: cover; " +
                 "-fx-background-position: center;");
+
+        BorderPane gameLayout = new BorderPane();
+
         gameController = new GameController(fullMovement);
         gameController.initializePlayers(p1Type, p2Type);
 
         HBox hud = createHUD(p1Type, p2Type);
-        root.setTop(hud);
+        gameLayout.setTop(hud);
 
         Canvas canvas = new Canvas(CANVAS_WIDTH, CANVAS_HEIGHT);
         StackPane canvasPane = new StackPane(canvas);
-        canvasPane.setStyle("-fx-border-color: gold; -fx-border-width: 4;");
-        root.setCenter(canvasPane);
+        canvasPane.setStyle("-fx-border-color: gold; -fx-border-width: 4; " +
+                "-fx-effect: dropshadow(gaussian, gold, 20, 0.6, 0, 0);");
+        gameLayout.setCenter(canvasPane);
 
         Label controlsLabel = new Label(
                 "P1: WASD=Move | F=Shoot | 1/2/3/4=Weapon | " +
                         "P2: Arrows=Move | L=Shoot | 7/8/9/0=Weapon"
         );
         controlsLabel.setTextFill(Color.YELLOW);
-        controlsLabel.setFont(Font.font(12));
+        controlsLabel.setFont(Font.font("Arial", FontWeight.BOLD, 12));
         controlsLabel.setPadding(new Insets(10));
-        controlsLabel.setStyle("-fx-background-color: rgba(0,0,0,0.7);");
-        root.setBottom(controlsLabel);
+        controlsLabel.setStyle("-fx-background-color: rgba(0,0,0,0.8); " +
+                "-fx-effect: dropshadow(gaussian, black, 8, 0.5, 0, 1);");
+        gameLayout.setBottom(controlsLabel);
+
+        root.getChildren().add(gameLayout);
 
         Scene scene = new Scene(root, 900, 750);
 
@@ -160,7 +174,8 @@ public class Main extends Application {
         HBox hud = new HBox(50);
         hud.setPadding(new Insets(15));
         hud.setAlignment(Pos.CENTER);
-        hud.setStyle("-fx-background-color: rgba(0,0,0,0.7);");
+        hud.setStyle("-fx-background-color: rgba(0,0,0,0.85); " +
+                "-fx-effect: dropshadow(gaussian, black, 10, 0.5, 0, 2);");
 
         VBox p1HUD = createPlayerHUD("Player 1 - " + p1Type.getDisplayName(), true);
         VBox p2HUD = createPlayerHUD("Player 2 - " + p2Type.getDisplayName(), false);
@@ -175,6 +190,7 @@ public class Main extends Application {
         Label nameLabel = new Label(name);
         nameLabel.setTextFill(Color.WHITE);
         nameLabel.setFont(Font.font("Arial", FontWeight.BOLD, 14));
+        nameLabel.setStyle("-fx-effect: dropshadow(gaussian, black, 5, 0.5, 0, 1);");
 
         ProgressBar healthBar = new ProgressBar(1.0);
         healthBar.setPrefWidth(250);
@@ -182,10 +198,11 @@ public class Main extends Application {
 
         Label healthLabel = new Label("100");
         healthLabel.setTextFill(Color.WHITE);
+        healthLabel.setFont(Font.font("Arial", FontWeight.BOLD, 12));
 
         Label weaponLabel = new Label("Weapon: Pistol");
         weaponLabel.setTextFill(Color.YELLOW);
-        weaponLabel.setFont(Font.font(12));
+        weaponLabel.setFont(Font.font("Arial", FontWeight.BOLD, 12));
 
         if (isPlayer1) {
             health1Bar = healthBar;
@@ -216,19 +233,38 @@ public class Main extends Application {
     }
 
     private void showWinner(Stage stage, String winner) {
-        VBox root = new VBox(30);
-        root.setAlignment(Pos.CENTER);
-        root.setPadding(new Insets(50));
+        StackPane root = new StackPane();
         root.setStyle("-fx-background-image: url('file:///C:/Users/alaa/Downloads/WhatsApp%20Image%202025-12-18%20at%2023.58.43_7f5e23cc.jpg'); " +
                 "-fx-background-size: cover; " +
                 "-fx-background-position: center;");
+
+        VBox winnerBox = new VBox(30);
+        winnerBox.setAlignment(Pos.CENTER);
+        winnerBox.setPadding(new Insets(50));
+        winnerBox.setPrefWidth(500);
+        winnerBox.setPrefHeight(500);
+        winnerBox.setMaxWidth(500);
+        winnerBox.setMaxHeight(500);
+        winnerBox.setStyle("-fx-background-color: rgba(0, 0, 0, 0.85); " +
+                "-fx-background-radius: 15; " +
+                "-fx-border-color: gold; " +
+                "-fx-border-width: 3; " +
+                "-fx-border-radius: 15; " +
+                "-fx-effect: dropshadow(gaussian, gold, 25, 0.7, 0, 0);");
+
         Label winnerLabel = new Label("🏆 " + winner + " Wins! 🏆");
-        winnerLabel.setFont(Font.font("Arial", FontWeight.BOLD, 50));
+        winnerLabel.setFont(Font.font("Arial", FontWeight.BOLD, 42));
         winnerLabel.setTextFill(Color.GOLD);
+        winnerLabel.setWrapText(true);
+        winnerLabel.setMaxWidth(400);
+        winnerLabel.setStyle("-fx-effect: dropshadow(gaussian, black, 15, 0.8, 0, 2); " +
+                "-fx-text-alignment: center;");
 
         Button playAgain = new Button("Play Again");
         playAgain.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; " +
-                "-fx-font-size: 18px; -fx-font-weight: bold; -fx-padding: 15 40;");
+                "-fx-font-size: 18px; -fx-font-weight: bold; -fx-padding: 15 40; " +
+                "-fx-background-radius: 8; " +
+                "-fx-effect: dropshadow(gaussian, black, 10, 0.5, 0, 2);");
         playAgain.setOnAction(e -> {
             if (gameController != null) {
                 gameController.stopGameLoop();
@@ -236,7 +272,9 @@ public class Main extends Application {
             stage.setScene(createSelectionScene(stage));
         });
 
-        root.getChildren().addAll(winnerLabel, playAgain);
+        winnerBox.getChildren().addAll(winnerLabel, playAgain);
+        root.getChildren().add(winnerBox);
+
         stage.setScene(new Scene(root, 900, 700));
     }
 

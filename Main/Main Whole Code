@@ -34,7 +34,9 @@ public class Main extends Application {
         VBox root = new VBox(20);
         root.setPadding(new Insets(30));
         root.setAlignment(Pos.CENTER);
-        root.setStyle("-fx-background-color: linear-gradient(to bottom right, #2c3e50, #3498db);");
+        root.setStyle("-fx-background-image: url('file:///C:/Users/alaa/Downloads/WhatsApp%20Image%202025-12-18%20at%2023.58.43_7f5e23cc.jpg'); " +
+                "-fx-background-size: cover; " +
+                "-fx-background-position: center;");
 
         Label title = new Label("⚔ BATTLE ARENA ⚔");
         title.setFont(Font.font("Arial", FontWeight.BOLD, 40));
@@ -107,8 +109,9 @@ public class Main extends Application {
 
     private Scene createGameScene(Stage stage, FighterType p1Type, FighterType p2Type, boolean fullMovement) {
         BorderPane root = new BorderPane();
-        root.setStyle("-fx-background-color: #1a1a2e;");
-
+        root.setStyle("-fx-background-image: url('file:///C:/Users/alaa/Downloads/WhatsApp%20Image%202025-12-18%20at%2023.58.43_7f5e23cc.jpg'); " +
+                "-fx-background-size: cover; " +
+                "-fx-background-position: center;");
         gameController = new GameController(fullMovement);
         gameController.initializePlayers(p1Type, p2Type);
 
@@ -216,8 +219,9 @@ public class Main extends Application {
         VBox root = new VBox(30);
         root.setAlignment(Pos.CENTER);
         root.setPadding(new Insets(50));
-        root.setStyle("-fx-background-color: linear-gradient(to bottom right, #2c3e50, #3498db);");
-
+        root.setStyle("-fx-background-image: url('file:///C:/Users/alaa/Downloads/WhatsApp%20Image%202025-12-18%20at%2023.58.43_7f5e23cc.jpg'); " +
+                "-fx-background-size: cover; " +
+                "-fx-background-position: center;");
         Label winnerLabel = new Label("🏆 " + winner + " Wins! 🏆");
         winnerLabel.setFont(Font.font("Arial", FontWeight.BOLD, 50));
         winnerLabel.setTextFill(Color.GOLD);

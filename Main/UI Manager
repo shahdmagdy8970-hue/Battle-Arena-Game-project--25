@@ -1,0 +1,168 @@
+package com.example.battlearena;
+
+import com.example.battlearena.models.FighterType;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.stage.Stage;
+
+public class UIManager {
+    
+    private ProgressBar health1Bar, health2Bar;
+    private Label health1Label, health2Label, weapon1Label, weapon2Label;
+
+public Scene createSelectionScene(Stage stage, SelectionCallback callback) {
+        VBox root = new VBox(20);
+        root.setPadding(new Insets(30));
+        root.setAlignment(Pos.CENTER);
+        root.setStyle("-fx-background-color: linear-gradient(to bottom right, #2c3e50, #3498db);");
+
+        Label title = new Label("⚔ BATTLE ARENA ⚔");
+        title.setFont(Font.font("Arial", FontWeight.BOLD, 40));
+        title.setTextFill(Color.GOLD);
+
+        Label teamLabel = new Label("Team Members Battle");
+        teamLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
+        teamLabel.setTextFill(Color.LIGHTBLUE);
+
+        HBox playersBox = new HBox(30);
+        playersBox.setAlignment(Pos.CENTER);
+
+        VBox player1Box = createPlayerSelectionBox("Player 1", FighterType.MARIAM, "W/A/S/D to move\nF to shoot\n1/2/3/4 to switch weapon");
+        ComboBox<FighterType> player1Choice = (ComboBox<FighterType>) player1Box.getChildren().get(1);
+
+        VBox player2Box = createPlayerSelectionBox("Player 2", FighterType.ALAA, "Arrow Keys to move\nL to shoot\n7/8/9/0 to switch weapon");
+        ComboBox<FighterType> player2Choice = (ComboBox<FighterType>) player2Box.getChildren().get(1);
+
+        playersBox.getChildren().addAll(player1Box, player2Box);
+
+        CheckBox fullMovementCheck = new CheckBox("Enable Full Movement & Rotation");
+        fullMovementCheck.setTextFill(Color.YELLOW);
+        fullMovementCheck.setFont(Font.font("Arial", FontWeight.BOLD, 14));
+
+        Label weaponInfo = new Label("✨ 4 Weapons Available ✨");
+        weaponInfo.setTextFill(Color.LIGHTGREEN);
+        weaponInfo.setFont(Font.font("Arial", FontWeight.BOLD, 12));
+
+        Label weaponDetails = new Label("Weapons: 1=Pistol, 2=Cannon, 3=Magic Staff, 4=Bow");
+        weaponDetails.setTextFill(Color.LIGHTBLUE);
+        weaponDetails.setFont(Font.font("Arial", 11));
+
+        Button startButton = new Button("START GAME");
+        startButton.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; " + "-fx-font-size: 18px; -fx-font-weight: bold; -fx-padding: 15 40;");
+        startButton.setOnAction(e -> {
+            boolean fullMovement = fullMovementCheck.isSelected();
+            callback.onStartGame(player1Choice.getValue(), player2Choice.getValue(), fullMovement);
+        });
+
+        root.getChildren().addAll(title, teamLabel, playersBox, fullMovementCheck,
+                weaponInfo, weaponDetails, startButton);
+        return new Scene(root, 900, 750);
+    }
+
+    private VBox createPlayerSelectionBox(String playerName, FighterType defaultChoice, String controls) {
+        VBox box = new VBox(10);
+        box.setPadding(new Insets(20));
+        box.setStyle("-fx-background-color: rgba(0,0,0,0.5); -fx-background-radius: 10;");
+
+        Label label = new Label(playerName);
+        label.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+        label.setTextFill(Color.WHITE);
+
+        ComboBox<FighterType> choice = new ComboBox<>();
+        choice.getItems().addAll(FighterType.values());
+        choice.setValue(defaultChoice);
+        choice.setStyle("-fx-font-size: 14px;");
+
+        Label controlsLabel = new Label(controls);
+        controlsLabel.setTextFill(Color.LIGHTGRAY);
+        controlsLabel.setFont(Font.font(12));
+
+        box.getChildren().addAll(label, choice, controlsLabel);
+        return box;
+    }
+
+    public HBox createHUD(FighterType p1Type, FighterType p2Type) {
+        HBox hud = new HBox(50);
+        hud.setPadding(new Insets(15));
+        hud.setAlignment(Pos.CENTER);
+        hud.setStyle("-fx-background-color: rgba(0,0,0,0.7);");
+
+        VBox p1HUD = createPlayerHUD("Player 1 - " + p1Type.getDisplayName(), true);
+        VBox p2HUD = createPlayerHUD("Player 2 - " + p2Type.getDisplayName(), false);
+
+        hud.getChildren().addAll(p1HUD, p2HUD);
+        return hud;
+    }
+
+    private VBox createPlayerHUD(String name, boolean isPlayer1) {
+        VBox hud = new VBox(5);
+
+        Label nameLabel = new Label(name);
+        nameLabel.setTextFill(Color.WHITE);
+        nameLabel.setFont(Font.font("Arial", FontWeight.BOLD, 14));
+
+        ProgressBar healthBar = new ProgressBar(1.0);
+        healthBar.setPrefWidth(250);
+        healthBar.setStyle("-fx-accent: red;");
+
+        Label healthLabel = new Label("100");
+        healthLabel.setTextFill(Color.WHITE);
+
+        Label weaponLabel = new Label("Weapon: Pistol");
+        weaponLabel.setTextFill(Color.YELLOW);
+        weaponLabel.setFont(Font.font(12));
+
+        if (isPlayer1) {
+            health1Bar = healthBar;
+            health1Label = healthLabel;
+            weapon1Label = weaponLabel;
+        } else {
+            health2Bar = healthBar;
+            health2Label = healthLabel;
+            weapon2Label = weaponLabel;
+        }
+
+        hud.getChildren().addAll(nameLabel, healthBar, healthLabel, weaponLabel);
+        return hud;
+    }
+
+    public Scene createWinnerScene(Stage stage, String winner, WinnerCallback callback) {
+        VBox root = new VBox(30);
+        root.setAlignment(Pos.CENTER);
+        root.setPadding(new Insets(50));
+        root.setStyle("-fx-background-color: linear-gradient(to bottom right, #2c3e50, #3498db);");
+
+        Label winnerLabel = new Label("🏆 " + winner + " Wins! 🏆");
+        winnerLabel.setFont(Font.font("Arial", FontWeight.BOLD, 50));
+        winnerLabel.setTextFill(Color.GOLD);
+
+        Button playAgain = new Button("Play Again");
+        playAgain.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; " +
+                "-fx-font-size: 18px; -fx-font-weight: bold; -fx-padding: 15 40;");
+        playAgain.setOnAction(e -> callback.onPlayAgain());
+
+        root.getChildren().addAll(winnerLabel, playAgain);
+        return new Scene(root, 900, 700);
+    }
+
+    public ProgressBar getHealth1Bar() { return health1Bar; }
+    public ProgressBar getHealth2Bar() { return health2Bar; }
+    public Label getHealth1Label() { return health1Label; }
+    public Label getHealth2Label() { return health2Label; }
+    public Label getWeapon1Label() { return weapon1Label; }
+    public Label getWeapon2Label() { return weapon2Label; }
+
+    public interface SelectionCallback {
+        void onStartGame(FighterType p1Type, FighterType p2Type, boolean fullMovement);
+    }
+
+    public interface WinnerCallback {
+        void onPlayAgain();
+    }
+}

@@ -8,10 +8,11 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 public class Main extends Application {
@@ -19,72 +20,53 @@ public class Main extends Application {
     private static final int CANVAS_HEIGHT = 600;
 
     private GameController gameController;
-    private UIManager uiManager;
+    private ProgressBar health1Bar, health2Bar;
+    private Label health1Label, health2Label, weapon1Label, weapon2Label;
 
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Battle Arena Game - Team Project");
-        
-        uiManager = new UIManager();
-        
-        Scene selectionScene = uiManager.createSelectionScene(primaryStage, 
-            (p1Type, p2Type, fullMovement) -> {
-                Scene gameScene = createGameScene(primaryStage, p1Type, p2Type, fullMovement);
-                primaryStage.setScene(gameScene);
-            }
-        );
-        
-        primaryStage.setScene(selectionScene);
         primaryStage.show();
     }
 
     private Scene createGameScene(Stage stage, FighterType p1Type, FighterType p2Type, boolean fullMovement) {
-        BorderPane root = new BorderPane();
-        root.setStyle("-fx-background-color: #1a1a2e;");
+        StackPane root = new StackPane();
+        root.setStyle("-fx-background-image: url('file:///C:/Users/alaa/Downloads/WhatsApp%20Image%202025-12-18%20at%2023.58.43_7f5e23cc.jpg'); " +
+                "-fx-background-size: cover; " +
+                "-fx-background-position: center;");
+
+        BorderPane gameLayout = new BorderPane();
 
         gameController = new GameController(fullMovement);
         gameController.initializePlayers(p1Type, p2Type);
 
-        HBox hud = uiManager.createHUD(p1Type, p2Type);
-        root.setTop(hud);
+        HBox hud = createHUD(p1Type, p2Type);
+        gameLayout.setTop(hud);
 
         Canvas canvas = new Canvas(CANVAS_WIDTH, CANVAS_HEIGHT);
         StackPane canvasPane = new StackPane(canvas);
-        canvasPane.setStyle("-fx-border-color: gold; -fx-border-width: 4;");
-        root.setCenter(canvasPane);
+        canvasPane.setStyle("-fx-border-color: gold; -fx-border-width: 4; " +
+                "-fx-effect: dropshadow(gaussian, gold, 20, 0.6, 0, 0);");
+        gameLayout.setCenter(canvasPane);
 
         Label controlsLabel = new Label(
                 "P1: WASD=Move | F=Shoot | 1/2/3/4=Weapon | " +
                         "P2: Arrows=Move | L=Shoot | 7/8/9/0=Weapon"
         );
         controlsLabel.setTextFill(Color.YELLOW);
-        controlsLabel.setFont(Font.font(12));
+        controlsLabel.setFont(Font.font("Arial", FontWeight.BOLD, 12));
         controlsLabel.setPadding(new Insets(10));
-        controlsLabel.setStyle("-fx-background-color: rgba(0,0,0,0.7);");
-        root.setBottom(controlsLabel);
+        controlsLabel.setStyle("-fx-background-color: rgba(0,0,0,0.8); " +
+                "-fx-effect: dropshadow(gaussian, black, 8, 0.5, 0, 1);");
+        gameLayout.setBottom(controlsLabel);
+
+        root.getChildren().add(gameLayout);
 
         Scene scene = new Scene(root, 900, 750);
 
-        setupKeyboardControls(scene);
-        setupGameStateListener(stage);
+        scene.setOnKeyPressed(e -> gameController.addKeyPressed(e.getCode()));
+        scene.setOnKeyReleased(e -> gameController.removeKeyPressed(e.getCode()));
 
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        gameController.startGameLoop(gc);
-
-        return scene;
-    }
-
-    private void setupKeyboardControls(Scene scene) {
-        scene.setOnKeyPressed(e -> {
-            gameController.addKeyPressed(e.getCode());
-        });
-
-        scene.setOnKeyReleased(e -> {
-            gameController.removeKeyPressed(e.getCode());
-        });
-    }
-
-    private void setupGameStateListener(Stage stage) {
         gameController.setGameStateListener(new GameController.GameStateListener() {
             @Override
             public void onPlayerHealthChanged() {
@@ -96,48 +78,76 @@ public class Main extends Application {
                 showWinner(stage, winner);
             }
         });
+
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        gameController.startGameLoop(gc);
+
+        return scene;
+    }
+
+    private HBox createHUD(FighterType p1Type, FighterType p2Type) {
+        HBox hud = new HBox(50);
+        hud.setPadding(new Insets(15));
+        hud.setAlignment(Pos.CENTER);
+        hud.setStyle("-fx-background-color: rgba(0,0,0,0.85); " +
+                "-fx-effect: dropshadow(gaussian, black, 10, 0.5, 0, 2);");
+
+        VBox p1HUD = createPlayerHUD("Player 1 - " + p1Type.getDisplayName(), true);
+        VBox p2HUD = createPlayerHUD("Player 2 - " + p2Type.getDisplayName(), false);
+
+        hud.getChildren().addAll(p1HUD, p2HUD);
+        return hud;
+    }
+
+    private VBox createPlayerHUD(String name, boolean isPlayer1) {
+        VBox hud = new VBox(5);
+
+        Label nameLabel = new Label(name);
+        nameLabel.setTextFill(Color.WHITE);
+        nameLabel.setFont(Font.font("Arial", FontWeight.BOLD, 14));
+        nameLabel.setStyle("-fx-effect: dropshadow(gaussian, black, 5, 0.5, 0, 1);");
+
+        ProgressBar healthBar = new ProgressBar(1.0);
+        healthBar.setPrefWidth(250);
+        healthBar.setStyle("-fx-accent: red;");
+
+        Label healthLabel = new Label("100");
+        healthLabel.setTextFill(Color.WHITE);
+        healthLabel.setFont(Font.font("Arial", FontWeight.BOLD, 12));
+
+        Label weaponLabel = new Label("Weapon: Pistol");
+        weaponLabel.setTextFill(Color.YELLOW);
+        weaponLabel.setFont(Font.font("Arial", FontWeight.BOLD, 12));
+
+        if (isPlayer1) {
+            health1Bar = healthBar;
+            health1Label = healthLabel;
+            weapon1Label = weaponLabel;
+        } else {
+            health2Bar = healthBar;
+            health2Label = healthLabel;
+            weapon2Label = weaponLabel;
+        }
+
+        hud.getChildren().addAll(nameLabel, healthBar, healthLabel, weaponLabel);
+        return hud;
     }
 
     private void updateHUD() {
         if (gameController != null) {
-            uiManager.getHealth1Bar().setProgress(
-                gameController.getPlayer1().getHealth() / gameController.getPlayer1().getMaxHealth()
-            );
-            uiManager.getHealth1Label().setText(
-                String.format("%.0f", gameController.getPlayer1().getHealth())
-            );
-            uiManager.getWeapon1Label().setText(
-                "Weapon: " + gameController.getPlayer1().getWeapon().getName()
-            );
+            health1Bar.setProgress(gameController.getPlayer1().getHealth() /
+                    gameController.getPlayer1().getMaxHealth());
+            health1Label.setText(String.format("%.0f", gameController.getPlayer1().getHealth()));
+            weapon1Label.setText("Weapon: " + gameController.getPlayer1().getWeapon().getName());
 
-            uiManager.getHealth2Bar().setProgress(
-                gameController.getPlayer2().getHealth() / gameController.getPlayer2().getMaxHealth()
-            );
-            uiManager.getHealth2Label().setText(
-                String.format("%.0f", gameController.getPlayer2().getHealth())
-            );
-            uiManager.getWeapon2Label().setText(
-                "Weapon: " + gameController.getPlayer2().getWeapon().getName()
-            );
+            health2Bar.setProgress(gameController.getPlayer2().getHealth() /
+                    gameController.getPlayer2().getMaxHealth());
+            health2Label.setText(String.format("%.0f", gameController.getPlayer2().getHealth()));
+            weapon2Label.setText("Weapon: " + gameController.getPlayer2().getWeapon().getName());
         }
     }
 
     private void showWinner(Stage stage, String winner) {
-        Scene winnerScene = uiManager.createWinnerScene(stage, winner, () -> {
-            if (gameController != null) {
-                gameController.stopGameLoop();
-            }
-            
-            Scene selectionScene = uiManager.createSelectionScene(stage,
-                (p1Type, p2Type, fullMovement) -> {
-                    Scene gameScene = createGameScene(stage, p1Type, p2Type, fullMovement);
-                    stage.setScene(gameScene);
-                }
-            );
-            stage.setScene(selectionScene);
-        });
-        
-        stage.setScene(winnerScene);
     }
 
     public static void main(String[] args) {

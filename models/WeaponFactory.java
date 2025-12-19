@@ -1,9 +1,7 @@
-public class WeaponFactory {
-}
 package com.example.battlearena.models;
 
 public class WeaponFactory {
-    public static com.example.battlearena.models.Weapon createWeapon(WeaponType type) {
+    public static Weapon createWeapon(WeaponType type) {
         switch (type) {
             case PISTOL:
                 return new Pistol();

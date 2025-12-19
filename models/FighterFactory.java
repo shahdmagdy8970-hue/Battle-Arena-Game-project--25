@@ -1,7 +1,7 @@
 package com.example.battlearena.models;
 
 public class FighterFactory {
-    public static com.example.battlearena.models.Fighter createFighter(FighterType type, double x, double y) {
+    public static Fighter createFighter(FighterType type, double x, double y) {
         switch (type) {
             case MARIAM:
                 return new Mariem(x, y);
